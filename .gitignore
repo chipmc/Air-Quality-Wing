@@ -53,3 +53,9 @@ Thumbs.db
 *.su
 *.idb
 *.pdb
+
+# Local credentials and private webhook exports
+.env
+.env.*
+!.env.example
+webhook.private.json

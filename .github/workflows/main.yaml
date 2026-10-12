@@ -1,37 +1,47 @@
-# Particle Compile Action Workflow
-# This workflow uses the Particle compile-action to compile Particle application firmware.
-# Make sure to set the particle-platform-name for your project.
-# For complete documentation, please refer to https://github.com/particle-iot/compile-action
-
 name: Particle Compile
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
+  host-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Honeywell driver regression
+        run: |
+          c++ -std=c++14 -Wall -Wextra -Werror -fsanitize=undefined -Itests/host -Isrc tests/host/honeywell_test.cpp src/HoneywellPM.cpp -o /tmp/aqw-honeywell-test
+          /tmp/aqw-honeywell-test
+      - name: Vendored library regression
+        run: |
+          c++ -std=c++14 -fsanitize=undefined -Itests/host -Ilib/particleflux-Si7021/src -Ilib/SparkFun_CCS811_Arduino_Library/src tests/host/library_regression.cpp lib/particleflux-Si7021/src/Si7021.cpp lib/SparkFun_CCS811_Arduino_Library/src/SparkFunCCS811.cpp -o /tmp/aqw-library-test
+          /tmp/aqw-library-test
+      - name: Application regression
+        run: python3 tests/host/application_regression.py
+
   compile:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-
-      # Particle Compile Action
-      - name: Compile Firmware
+      - name: Compile Argon firmware (no flashing)
         id: compile
         uses: particle-iot/compile-action@v1
         with:
-          # Set the particle-platform-name to the platform you're targeting.
-          # Allowed values: core, photon, p1, electron, argon, boron, xenon, esomx, bsom, b5som, tracker, trackerm, p2, msom
-          particle-platform-name: 'p2'
-
-      # Optional: Upload compiled firmware as an artifact on GitHub.
-      - name: Upload Firmware as Artifact
-        uses: actions/upload-artifact@v3
+          particle-platform-name: argon
+          device-os-version: '6.4.1'
+          # No Particle access token: local runner build with vendored lib/ sources.
+      - name: Upload compiled firmware
+        uses: actions/upload-artifact@v4
         with:
-          name: firmware-artifact
+          name: argon-firmware-6.4.1
           path: |
             ${{ steps.compile.outputs.firmware-path }}
             ${{ steps.compile.outputs.target-path }}
