@@ -44,8 +44,11 @@ No sample timestamp is included; Particle's event metadata supplies publish time
    Cloud Secret named `UBIDOTS_TOKEN`. Enter the credential only in the secure
    secret editor. Limit its Ubidots permissions to the required ingestion scope
    where available. Do not save its value in the repository or event payload.
-2. Create or edit the webhook for event `air_quality`, scoped to the owner's
-   Argon device. Particle event filters match prefixes; verify the event name
+2. Create or edit the webhook for event `air_quality`. In a developer sandbox,
+   select the owner's Argon using the Device filter. Product and organization
+   integrations do not offer that filter; the owner must verify their scope and
+   apply device-ID filtering in the receiving service if necessary. Particle
+   event filters match prefixes; verify the event name
    and avoid overlapping names or duplicate webhooks that write twice.
 3. Use HTTP **POST**, **Custom Body**, and disable **Include Default Data**.
    For a new per-device mapping, the URL is:
@@ -113,7 +116,8 @@ staleness separately from the firmware's sensor freshness gate.
 
 ## Primary documentation
 
-- [Particle webhook reference and Cloud Secrets](https://docs.particle.io/reference/cloud-apis/webhooks/)
+- [Particle webhook reference](https://docs.particle.io/reference/cloud-apis/webhooks/)
+- [Particle Cloud Secrets](https://docs.particle.io/getting-started/cloud/secrets/)
 - [Particle JSON and webhook templates](https://docs.particle.io/firmware/best-practices/json/)
 - [Ubidots Particle webhook guide](https://help.ubidots.com/en/articles/513304-connect-your-particle-device-to-ubidots-using-particle-webhooks)
 
