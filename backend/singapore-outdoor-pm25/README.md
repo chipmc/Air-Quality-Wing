@@ -76,7 +76,7 @@ Use an isolated tooling environment. This implementation pins **ubidots-cli
 2.1.2**, whose command/manifest structure differs from older website examples:
 
 ```sh
-python3.14 -m venv backend/singapore-outdoor-pm25/.venv
+python3.12 -m venv backend/singapore-outdoor-pm25/.venv
 source backend/singapore-outdoor-pm25/.venv/bin/activate
 python -m pip install -r backend/singapore-outdoor-pm25/requirements-dev.txt
 ubidots login
@@ -84,7 +84,8 @@ ubidots login
 
 `ubidots config` is the interactive alternative for an account token. The local
 CLI login/profile is a deployment credential, separate from the function's
-runtime account-token binding. Keep profiles outside Git. Use **Python 3.12+ for the CLI** (3.14 is verified here); the cloud code targets
+runtime account-token binding. Keep profiles outside Git. Use **Python 3.12 for the CLI** (3.14 passed locally on macOS, but its older
+CLI dependencies require system development headers on a clean Linux runner); the cloud code targets
 `python3.11:lite`. CLI 2.1.2 declares support for older Python versions but its
 OAuth module uses Python 3.12 syntax, as confirmed by the first packaging CI run. Docker is optional for
 this workflow: unit tests run directly and cloud deployment uses the CLI. Its
