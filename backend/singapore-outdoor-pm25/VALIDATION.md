@@ -15,7 +15,7 @@ Firmware sources, host tests and vendored drivers are unchanged by this backend.
 | Workflow / source syntax / links | Passed | YAML/JSON/Python parsing, local relative links and whitespace checks |
 | Python 3.11 cloud runtime | Not run | Behavior tested locally with Python 3.10 and 3.14; CI includes Python 3.11 and 3.14 |
 | Independent LLM review | Not run | Requires a separate reviewer/session; no independent review claim is made |
-| GitHub Actions | Not run | Workflow prepared; confirm after publishing |
+| Initial GitHub Actions | Partially passed | Behavior tests passed on Python 3.11/3.14 and host checks passed. Packaging exposed CLI 2.1.2 Python 3.12 syntax despite its older-Python metadata. Packaging now selects verified Python 3.14; confirm the latest run on the PR |
 | UbiFunction deployment | Not run | Owner CLI login, actual device API label, data.gov.sg key and account-token binding required |
 | Live Ubidots writes and scheduled invocation | Not run | Owner must verify the selected account token reaches the scheduler, settings persist across code pushes, and timestamps/context are stored as expected |
 
@@ -28,7 +28,7 @@ python -m unittest discover -s backend/singapore-outdoor-pm25/tests -v
 ```
 
 The plain Python run passes behavior tests and skips packaging tests if the CLI
-is absent. With CLI 2.1.2 installed, all 28 tests pass. The source reference checked
+is absent. With CLI 2.1.2 installed, all 28 tests pass. Deployment tooling requires Python 3.12+; local verification used 3.14. The source reference checked
 for CLI behavior was upstream commit `fe86b72feafe74d1b4c258e2234959a2138c23f3`.
 
 ## Remaining owner acceptance

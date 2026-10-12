@@ -34,7 +34,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.14'
       - name: Install pinned deployment tooling
         run: python -m pip install -r backend/singapore-outdoor-pm25/requirements-dev.txt
       - name: Verify CLI manifest and upload allowlist (no login or deployment)

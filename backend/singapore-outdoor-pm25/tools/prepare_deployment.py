@@ -2,6 +2,7 @@
 import argparse
 import json
 import shutil
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -9,6 +10,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def prepare(device_label, live=False, schedule=False):
+    if sys.version_info < (3, 12):
+        raise RuntimeError("Ubidots CLI 2.1.2 requires Python 3.12+; use the documented tooling environment")
     import yaml  # Provided by the pinned CLI; not needed by the deployed function.
     target = ROOT / ".deploy" / "singapore-outdoor-pm25"
     manifest_path = target / ".manifest.yaml"
