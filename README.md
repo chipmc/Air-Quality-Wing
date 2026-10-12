@@ -81,3 +81,16 @@ Vendored `particleflux-Si7021` 1.2.1 and
 `SparkFun_CCS811_Arduino_Library` 2.0.1 retain their upstream MIT license notices.
 Required short-read, initialization and timing fixes are documented in the
 [technical reference](docs/HARDWARE_REFERENCE.md#vendored-dependencies-and-required-fixes).
+
+## Indoor + outdoor PM2.5 backend
+
+The [scheduled outdoor PM2.5 UbiFunction](backend/singapore-outdoor-pm25/README.md)
+adds NEA's central-region one-hour PM2.5 to the existing Ubidots device every
+15 minutes after deployment and schedule activation. It includes source, tests,
+credential-free sample data and a pinned CLI workflow for VS Code. Indoor
+firmware and its webhook are unchanged. Regional outdoor context and recent
+indoor measurements have different measurement periods.
+
+The implementation is prepared for sharing and owner deployment; see its
+[validation record](backend/singapore-outdoor-pm25/VALIDATION.md) before assuming
+it has been deployed or tested with live credentials.

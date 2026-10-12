@@ -59,3 +59,9 @@ Thumbs.db
 .env.*
 !.env.example
 webhook.private.json
+
+# Backend tooling and private CLI metadata
+**/.deploy/
+**/.venv/
+**/__pycache__/
+**/.manifest.yaml

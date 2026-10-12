@@ -1,0 +1,13 @@
+{
+  "code": 0,
+  "data": {
+    "regionMetadata": [{"name": "central", "labelLocation": {"latitude": 1.35735, "longitude": 103.82}}],
+    "items": [{
+      "date": "2026-10-12",
+      "timestamp": "2026-10-12T16:00:00+08:00",
+      "updatedTimestamp": "2026-10-12T16:15:00+08:00",
+      "readings": {"pm25_one_hourly": {"north": 11, "south": 12, "east": 13, "west": 14, "central": 15}}
+    }]
+  },
+  "errorMsg": ""
+}
