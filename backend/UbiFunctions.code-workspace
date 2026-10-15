@@ -18,7 +18,8 @@
     "files.exclude": {
       "**/.venv": true,
       "**/__pycache__": true
-    }
+    },
+    "git.openRepositoryInParentFolders": "always"
   },
   "extensions": {
     "recommendations": [
