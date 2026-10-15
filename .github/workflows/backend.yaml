@@ -24,7 +24,9 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - name: Offline behavior checks (no credentials)
-        run: python -m unittest discover -s backend/singapore-outdoor-pm25/tests -v
+        run: |
+          python -m unittest discover -s backend/tests -v
+          python -m unittest discover -s backend/singapore-outdoor-pm25/tests -v
       - name: Fixture preview (no live API calls)
         run: python backend/singapore-outdoor-pm25/tools/preview.py --fixture backend/singapore-outdoor-pm25/tests/fixtures/pm25.json --at 2026-10-12T16:20:00+08:00
 
@@ -36,6 +38,8 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install pinned deployment tooling
-        run: python -m pip install -r backend/singapore-outdoor-pm25/requirements-dev.txt
+        run: python -m pip install -r backend/requirements-dev.txt
       - name: Verify CLI manifest and upload allowlist (no login or deployment)
-        run: python -m unittest discover -s backend/singapore-outdoor-pm25/tests -v
+        run: |
+          python -m unittest discover -s backend/tests -v
+          python -m unittest discover -s backend/singapore-outdoor-pm25/tests -v

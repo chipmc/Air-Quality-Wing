@@ -1,0 +1,2 @@
+# Python 3.12 recommended; one tooling environment shared by all backend functions.
+ubidots-cli==2.1.2

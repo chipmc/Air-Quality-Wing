@@ -1,0 +1,8 @@
+{
+  "label": "singapore-outdoor-pm25",
+  "runtime": "python3.11:lite",
+  "cron": "*/15 * * * *",
+  "http_enabled": false,
+  "requires_device_label": true,
+  "files": ["main.py", "config.json"]
+}

@@ -94,3 +94,8 @@ indoor measurements have different measurement periods.
 The implementation is prepared for sharing and owner deployment; see its
 [validation record](backend/singapore-outdoor-pm25/VALIDATION.md) before assuming
 it has been deployed or tested with live credentials.
+
+Develop UbiFunctions in the dedicated [VS Code backend workspace](backend/README.md):
+shared tooling, local tests, account profiles, explicit deployment and a starter
+for future Git-versioned Python functions. Firmware reporting-frequency changes
+remain a separate owner task.

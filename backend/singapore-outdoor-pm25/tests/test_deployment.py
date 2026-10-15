@@ -26,6 +26,7 @@ class DeploymentTests(unittest.TestCase):
     def setUp(self):
         self.directory = tempfile.TemporaryDirectory()
         self.root = Path(self.directory.name)
+        shutil.copyfile(ROOT / "project.json", self.root / "project.json")
         shutil.copytree(ROOT / "function", self.root / "function", ignore=shutil.ignore_patterns("__pycache__"))
         self.patch = patch.object(p, "ROOT", self.root)
         self.patch.start()

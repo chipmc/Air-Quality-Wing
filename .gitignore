@@ -65,3 +65,6 @@ webhook.private.json
 **/.venv/
 **/__pycache__/
 **/.manifest.yaml
+
+# Shared, portable backend workspace (contains no account configuration)
+!backend/UbiFunctions.code-workspace

@@ -70,6 +70,13 @@ path, but the deployed function requires a configured `DATAGOVSG_API_KEY` for
 production. Supply it through a private environment; never put a key on a command
 line, in a public file or in a test fixture. Public requests may be rate-limited.
 
+## Reusable VS Code workflow
+
+For the shared workspace, account profiles, tests and new-function starter, use
+[backend/README.md](../README.md). Its profile-suffixed remote function names
+isolate development/production copies. The manual commands below remain supported
+for an unsuffixed deployment; choose one path consistently for a given function.
+
 ## VS Code → UbiFunctions deployment
 
 Use an isolated tooling environment. This implementation pins **ubidots-cli
