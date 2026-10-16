@@ -105,6 +105,13 @@ class IngestionTests(unittest.TestCase):
         self.assertEqual(request.calls[-1][3][m.VARIABLE]["timestamp"], 1791792000000)
         self.assertNotIn("token=", request.calls[-1][1])
 
+    def test_source_request_identifies_project_instead_of_default_python_client(self):
+        request = FakeHTTP([(200, FIXTURE)])
+        self.ingest(request, ("central", "existing-monitor", "preview", 10800))
+        self.assertEqual(request.calls[0][2]["User-Agent"], "Air-Quality-Wing/1.0")
+        self.assertEqual(request.calls[0][2]["x-api-key"], "test-dgs-credential")
+        self.assertEqual(len(request.calls), 1)
+
     def test_preview_never_contacts_ubidots(self):
         request = FakeHTTP([(200, FIXTURE)])
         self.assertEqual(self.ingest(request, ("central", "existing-monitor", "preview", 10800))["status"], "preview")
@@ -161,6 +168,29 @@ class IngestionTests(unittest.TestCase):
         with patch.object(m, "load_config", return_value=CONFIG), patch.dict(os.environ, {"DATAGOVSG_API_KEY": "private-key"}, clear=True), patch.object(m, "ingest", return_value={"status": "written"}) as ingest:
             m.main({"_auth_token": "platform-token", "token": "caller-token", "device": "wrong", "region": "west"})
             self.assertEqual(ingest.call_args.args, (CONFIG, "private-key", "platform-token"))
+
+    def test_main_reads_global_property_label_and_preserves_uppercase_fallback(self):
+        for environment, expected in [
+            ({"datagovsg_api_key": "lowercase-key"}, "lowercase-key"),
+            ({"DATAGOVSG_API_KEY": "uppercase-key"}, "uppercase-key"),
+            ({"datagovsg_api_key": "preferred-key", "DATAGOVSG_API_KEY": "other-key"}, "preferred-key"),
+            ({}, ""),
+        ]:
+            with self.subTest(environment_names=list(environment)):
+                with patch.object(m, "load_config", return_value=CONFIG), patch.dict(os.environ, environment, clear=True), patch.object(m, "ingest", return_value={"status": "preview"}) as ingest:
+                    m.main({"_auth_token": "platform-token"})
+                    self.assertEqual(ingest.call_args.args, (CONFIG, expected, "platform-token"))
+
+    def test_source_http_diagnostics_expose_only_valid_status(self):
+        for status in (401, 403, 429, 503):
+            with self.subTest(status=status):
+                with self.assertRaises(m.IngestionError) as caught:
+                    self.ingest(FakeHTTP([(status, {"message": "SECRET_VALUE"})]))
+                self.assertEqual(caught.exception.http_status, status)
+                with patch.object(m, "load_config", return_value=CONFIG), patch.object(m, "ingest", side_effect=caught.exception):
+                    self.assertEqual(m.main({}), {"status": "error", "reason": "source_http_error", "http_status": status})
+        for invalid in (True, "SECRET_VALUE", 999, None):
+            self.assertIsNone(m.IngestionError("source_http_error", http_status=invalid).http_status)
 
     def test_main_does_not_expose_unexpected_exception_or_args(self):
         with patch.object(m, "load_config", side_effect=RuntimeError("SECRET_VALUE")):

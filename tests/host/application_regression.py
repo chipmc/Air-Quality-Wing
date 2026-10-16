@@ -21,6 +21,8 @@ assert function('void setup(').split('{', 1)[1].lstrip().startswith('initializeU
 assert '#define ENABLE_USB_SERIAL_WAIT true' in source
 assert '#define ENABLE_PUBLISH true' in source
 assert 'reportDue(now)' in function('void loop(')
+assert 'elapsed(now, lastPmRead, pmSampleInterval)' in function('void loop(')
+assert 'elapsed(now, lastPmAttempt, pmRetryInterval)' in function('void loop(')
 report = function('void report(')
 rssi_start = report.index('const int32_t rssi')
 rssi_end = report.index('json.endObject()', rssi_start)
@@ -49,7 +51,7 @@ unsigned waited=0;
 void pinMode(int pin,int value){mode[pin]=value;level[pin]=LOW;gpioCalls.push_back("mode"+std::to_string(pin));}
 void digitalWrite(int pin,int value){assert(mode[pin]==OUTPUT);level[pin]=value;gpioCalls.push_back("write"+std::to_string(pin)+"="+std::to_string(value));}
 void delay(unsigned ms){waited+=ms;clockMs+=ms;}
-constexpr uint32_t reportInterval=60000;
+constexpr uint32_t reportInterval=15*60000;
 uint32_t pmPowerTime=0,pmStartTime=0,lastReport=0;
 bool firstReport=true,pmStarted=false;
 constexpr int CSS811_STATUS=0,CSS811_ERROR_ID=0xe0;
@@ -74,6 +76,16 @@ struct Logger {
  void info(const char* format,...){char buf[160];va_list ap;va_start(ap,format);vsnprintf(buf,sizeof(buf),format,ap);va_end(ap);infos.push_back(buf);}
  void warn(const char* format,...){char buf[160];va_list ap;va_start(ap,format);vsnprintf(buf,sizeof(buf),format,ap);va_end(ap);last=buf;warnings.push_back(buf);}
 } Log;
+struct HoneywellPM {
+ enum class Result {OK,TIMEOUT};
+ Result result=Result::OK;
+ uint16_t next25=0,next10=0;
+ Result read(uint16_t& pm25,uint16_t& pm10){pm25=next25;pm10=next10;return result;}
+ static const char* status(Result result){return result==Result::OK?"ok":"timeout";}
+} honeywell;
+bool pmValid=false;
+uint16_t pm25=0,pm10=0;
+uint32_t pmTime=0;
 bool ccsReady=true,vocValid=true,vocErrorLogged=false;
 uint16_t eco2=0,tvoc=0;uint32_t vocTime=0;
 struct FakeWifi {bool connected=false;int32_t signal=0;bool ready(){return connected;}int32_t RSSI(){return signal;}} WiFi;
@@ -103,9 +115,15 @@ int main(){
  assert(!reportDue(12349));assert(reportDue(12350));
  pmStarted=false;assert(!reportDue(12099));assert(reportDue(12100)); // Missing PM cannot block diagnostics.
  firstReport=false;lastReport=12350;
- assert(!reportDue(72349));assert(reportDue(72350));
+ assert(!reportDue(912349));assert(reportDue(912350));
  firstReport=true;pmStarted=true;pmPowerTime=0xffffe000;pmStartTime=pmPowerTime+6250;
  assert(!reportDue(uint32_t(pmStartTime+5999)));assert(reportDue(uint32_t(pmStartTime+6000)));
+ clockMs=20000;honeywell.result=HoneywellPM::Result::OK;honeywell.next25=12;honeywell.next10=20;
+ readPm();assert(pmValid && pm25==12 && pm10==20 && pmTime==20000);
+ clockMs=80000;honeywell.result=HoneywellPM::Result::TIMEOUT;
+ readPm();assert(pmValid && pm25==12 && pm10==20 && pmTime==20000);
+ honeywell.result=HoneywellPM::Result::OK;honeywell.next25=1001;honeywell.next10=20;
+ readPm();assert(pmValid && pm25==12 && pm10==20 && pmTime==20000);
  readVoc();assert(!vocValid && ccs811.errorReads==1 && ccs811.measurementReads==0);
  assert(Log.warnings[Log.warnings.size()-2]=="CCS811 STATUS=0x89 DATA_READY=1 ERROR=1 APP_VALID=0 FW_MODE=1");
  assert(Log.last=="CCS811 ERROR_ID=0x10");
@@ -132,12 +150,12 @@ int main(){
  WiFi.connected=true;WiFi.signal=0;emitRssi();assert(json.isNull);
  WiFi.signal=1;emitRssi();assert(json.isNull);
  WiFi.signal=-58;emitRssi();assert(!json.isNull && json.number==-58);
- puts("Application: GPIO ordering/states/settling, first-report warmup, missing PM, cadence, rollover, CCS811 STATUS flags/failed reads/ERROR_ID handling and RSSI validation passed");
+ puts("Application: GPIO ordering/states/settling, PM sampling/retention, first-report warmup, 15-minute cadence, rollover, CCS811 STATUS flags/failed reads/ERROR_ID handling and RSSI validation passed");
 }
 '''
 functions = '\n'.join(function(sig) for sig in (
     'bool elapsed(', 'void initializeUsbSerial(', 'void initializeControlPins(', 'bool reportDue(',
-    'void logCcsError(', 'void logCcsStatus(', 'void readVoc('))
+    'void logCcsError(', 'void logCcsStatus(', 'void readVoc(', 'void readPm('))
 with tempfile.TemporaryDirectory(prefix='aqw-application-test-') as tmp:
     cpp = Path(tmp) / 'test.cpp'
     binary = Path(tmp) / 'test'

@@ -66,7 +66,7 @@ python3 backend/singapore-outdoor-pm25/tools/preview.py
 ```
 
 The preview tool never writes to Ubidots. An API key is optional for this testing
-path, but the deployed function requires a configured `DATAGOVSG_API_KEY` for
+path, but the deployed function requires a configured `datagovsg_api_key` for
 production. Supply it through a private environment; never put a key on a command
 line, in a public file or in a test fixture. Public requests may be rate-limited.
 
@@ -123,7 +123,7 @@ Configure the function in Ubidots before enabling it:
    it to `main(args)` as `_auth_token`. The code does not consume a caller's ordinary
    `token`, `device`, `region` or mode arguments. An optional `UBIDOTS_TOKEN` private
    environment fallback exists for local/custom-runtime use.
-2. Create a text-format Secret Global Property labelled `DATAGOVSG_API_KEY`, enter
+2. Create a text-format Secret Global Property labelled `datagovsg_api_key`, enter
    your key privately, and bind it to the function's environment. The label and
    raw environment value must match exactly; do not enter JSON into a text secret.
    Global Properties currently require the account feature described in Ubidots'
@@ -187,3 +187,13 @@ acceptance follow before publishing a validated deployment claim. See
 - [Secret Global Properties](https://help.ubidots.com/en/articles/9265555-ubifunctions-using-global-properties)
 - [Send timestamped dots](https://docs.ubidots.com/v1.6/reference/send-data-to-a-device)
 - [Retrieve existing dots](https://docs.ubidots.com/v1.6/reference/live-test-get-variable-data)
+
+The Singapore secret is read by its actual Global Property label,
+`datagovsg_api_key`, not the uppercase display name. Uppercase
+`DATAGOVSG_API_KEY` remains supported as a local/legacy environment fallback.
+
+Source requests identify this project with `User-Agent: Air-Quality-Wing/1.0`.
+On 15 October 2026 a local public probe returned 403 for the default Python
+client and 200 with this identifier. This observation does not validate a key
+or guarantee cloud access. `source_http_error` includes a numeric `http_status`
+for diagnosis, without disclosing source response bodies or credentials.

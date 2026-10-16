@@ -1,0 +1,29 @@
+name: Native PM2.5 display
+
+on:
+  pull_request:
+    branches: [main]
+    paths: ['display/**', '.github/workflows/display.yaml']
+  push:
+    branches: [main]
+    paths: ['display/**', '.github/workflows/display.yaml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ['3.11', '3.14']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Read-only display behavior checks (no credentials or GUI)
+        run: python -m unittest discover -s display/reterminal/tests -v
+      - name: Check Python 3.7 source grammar
+        run: python -c "import ast,pathlib; [ast.parse(p.read_text(), feature_version=(3,7)) for p in pathlib.Path('display/reterminal').glob('*.py')]"

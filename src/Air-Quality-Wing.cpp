@@ -19,9 +19,12 @@ SYSTEM_MODE(AUTOMATIC);
 SerialLogHandler logHandler(115200, LOG_LEVEL_INFO);
 
 namespace {
-constexpr uint32_t reportInterval = 60000;
+constexpr uint32_t reportInterval = 15L*60000L;
 constexpr uint32_t conditioningTime = 20 * 60 * 1000;
 constexpr uint32_t freshnessTime = 10000;
+constexpr uint32_t pmSampleInterval = 60000;
+constexpr uint32_t pmFreshnessTime = 2 * pmSampleInterval;
+constexpr uint32_t pmRetryInterval = 60000;
 Si7021 si7021;
 CCS811 ccs811(0x5A);
 HoneywellPM honeywell(Serial1);
@@ -32,7 +35,7 @@ float temperature = 0, humidity = 0;
 uint16_t tvoc = 0, eco2 = 0, pm25 = 0, pm10 = 0;
 uint32_t environmentTime = 0, vocTime = 0, pmTime = 0;
 uint32_t pmPowerTime = 0, ccsStartTime = 0, pmStartTime = 0;
-uint32_t lastEnvironment = 0, lastVoc = 0, lastPmAttempt = 0, lastReport = 0;
+uint32_t lastEnvironment = 0, lastVoc = 0, lastPmAttempt = 0, lastPmRead = 0, lastReport = 0;
 bool firstReport = true;
 
 bool elapsed(uint32_t now, uint32_t since, uint32_t interval) {
@@ -144,15 +147,20 @@ void readVoc() {
 }
 
 void readPm() {
-    pmValid = false;
-    const auto result = honeywell.read(pm25, pm10);
+    uint16_t nextPm25 = 0, nextPm10 = 0;
+    const auto result = honeywell.read(nextPm25, nextPm10);
     if (result != HoneywellPM::Result::OK) {
         Log.warn("Honeywell read: %s", HoneywellPM::status(result));
         return;
     }
-    pmValid = pm25 <= 1000 && pm10 <= 1000;
-    if (pmValid) pmTime = millis();
-    else Log.warn("Honeywell invalid measurement range");
+    if (nextPm25 > 1000 || nextPm10 > 1000) {
+        Log.warn("Honeywell invalid measurement range");
+        return;
+    }
+    pm25 = nextPm25;
+    pm10 = nextPm10;
+    pmValid = true;
+    pmTime = millis();
 }
 
 void report() {
@@ -160,7 +168,7 @@ void report() {
     const bool env = environmentValid && !elapsed(now, environmentTime, freshnessTime);
     const bool voc = vocValid && !elapsed(now, vocTime, freshnessTime) &&
         ccsConditioned;
-    const bool pm = pmValid && !elapsed(now, pmTime, freshnessTime);
+    const bool pm = pmValid && !elapsed(now, pmTime, pmFreshnessTime);
     char payload[256];
     JSONBufferWriter json(payload, sizeof(payload) - 1);
     json.beginObject();
@@ -237,7 +245,7 @@ void loop() {
     }
     // Initialization failures get a simple, bounded retry every 60 seconds.
     if (!pmStarted && elapsed(now, pmPowerTime, 6000) &&
-        (lastPmAttempt == 0 || elapsed(now, lastPmAttempt, reportInterval))) {
+        (lastPmAttempt == 0 || elapsed(now, lastPmAttempt, pmRetryInterval))) {
         lastPmAttempt = now;
         const auto result = honeywell.start();
         pmStarted = result == HoneywellPM::Result::OK;
@@ -245,12 +253,15 @@ void loop() {
         Log.info("Honeywell initialization: %s", HoneywellPM::status(result));
     }
     now = millis();
-    // Six seconds of measurements before the first report, without a long delay.
+    if (pmStarted && elapsed(now, pmStartTime, 6000) &&
+        (lastPmRead == 0 || elapsed(now, lastPmRead, pmSampleInterval))) {
+        lastPmRead = now;
+        readPm();
+    }
+    now = millis();
     if (reportDue(now)) {
         lastReport = now;
         firstReport = false;
-        pmValid = false;
-        if (pmStarted && elapsed(now, pmStartTime, 6000)) readPm();
         report();
     }
 }

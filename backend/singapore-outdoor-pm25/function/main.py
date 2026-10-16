@@ -21,6 +21,10 @@ MAX_RESPONSE_BYTES = 1024 * 1024
 class IngestionError(Exception):
     """Only fixed, credential-free messages are returned to callers."""
 
+    def __init__(self, reason, http_status=None):
+        super().__init__(reason)
+        self.http_status = http_status if type(http_status) is int and 100 <= http_status <= 599 else None
+
 
 class NoRedirects(HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
@@ -141,9 +145,10 @@ def ingest(config, dgs_key, token, request=request_json, now=None):
     if mode == "live" and (not isinstance(token, str) or not token.strip() or "{{" in token):
         raise IngestionError("configure_function_account_token")
     status, source = request("GET", DGS_URL,
-                             {"x-api-key": dgs_key, "Accept": "application/json"})
+                             {"x-api-key": dgs_key, "Accept": "application/json",
+                              "User-Agent": "Air-Quality-Wing/1.0"})
     if status != 200:
-        raise IngestionError("source_http_error")
+        raise IngestionError("source_http_error", http_status=status)
     dot = select_observation(source, region, now, max_age)
     if mode == "preview":
         return {"status": "preview", "variable": VARIABLE, "dot": dot}
@@ -192,9 +197,14 @@ def main(args):
         # Ignore caller-supplied device/region/mode/token; destination comes from configuration.
         token = args.get("_auth_token") if isinstance(args, dict) else None
         token = token or os.environ.get("UBIDOTS_TOKEN")  # local/private environment fallback
-        return ingest(config, os.environ.get("DATAGOVSG_API_KEY", ""), token)
+        # Global Property labels can differ in case from their display names.
+        dgs_key = os.environ.get("datagovsg_api_key") or os.environ.get("DATAGOVSG_API_KEY", "")
+        return ingest(config, dgs_key, token)
     except IngestionError as exc:
-        return {"status": "error", "reason": str(exc)}
+        result = {"status": "error", "reason": str(exc)}
+        if exc.http_status is not None:
+            result["http_status"] = exc.http_status
+        return result
     except Exception:
         # Do not expose unexpected exception text, URLs, request bodies or secrets.
         return {"status": "error", "reason": "unexpected_error"}

@@ -1,5 +1,9 @@
 # UbiFunctions development in VS Code
 
+Reusable guides: [environment setup](../docs/DEVELOPMENT_ENVIRONMENT.md),
+[AI development workflow](../docs/AI_DEVELOPMENT_WORKFLOW.md),
+[CI/CD pipeline](../docs/CI_CD_PIPELINE.md), and [work orders](../docs/workorders/README.md).
+
 This repository is the source of truth for function source, public settings,
 tests and deployment tooling. The first example is Singapore outdoor PM2.5 for
 the existing Argon air quality monitor. Additional functions use the same layout,
@@ -58,7 +62,7 @@ For the outdoor example:
 1. Supply the actual existing device **API label**, separate from its display name
    and `ARGON_UBIDOTS_KEY`. That last name refers to a credential, not a device label.
 2. In Ubidots Global Properties, create a text **Secret** labelled
-   `DATAGOVSG_API_KEY`. Enter the Singapore API key privately, with Functions scope.
+   `datagovsg_api_key`. Enter the Singapore API key privately, with Functions scope.
    Bind it in the new function's environment after the first preview deployment.
    Both Functions and Global Properties are available in the owner's account.
 3. Run **Prepare PM2.5 preview (local only)** with profile `aqw-dev`. The remote
@@ -67,7 +71,7 @@ For the outdoor example:
    and invokes the CLI. Confirm the intended account/function at its prompt.
    The initial deployment has HTTP and scheduling disabled and uses preview mode.
 5. In the function's Ubidots settings, select the account token and bind the
-   `DATAGOVSG_API_KEY` secret. Do not copy either credential into code or a manifest.
+   `datagovsg_api_key` secret. Do not copy either credential into code or a manifest.
 6. Run **Run selected remote function** and inspect the preview result/logs.
    Confirm central-region data and source timestamps. Error dictionaries must be
    treated as failures even if the invocation itself returns HTTP 200.
@@ -156,3 +160,7 @@ been deployed by this update.
 - [CLI UbiFunctions guide](https://dev.ubidots.com/sdks/cli/ubifunctions)
 - [Account token](https://dev.ubidots.com/ubifunctions/advanced/account-token)
 - [Secret Global Properties](https://help.ubidots.com/en/articles/9265555-ubifunctions-using-global-properties)
+
+The Singapore secret is read by its actual Global Property label,
+`datagovsg_api_key`, not the uppercase display name. Uppercase
+`DATAGOVSG_API_KEY` remains supported as a local/legacy environment fallback.
