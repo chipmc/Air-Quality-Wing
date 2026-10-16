@@ -1,0 +1,438 @@
+{
+  "folders": [
+    {
+      "name": "UbiFunctions",
+      "path": "."
+    }
+  ],
+  "settings": {
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+    "python.testing.unittestEnabled": true,
+    "python.testing.pytestEnabled": false,
+    "python.testing.unittestArgs": [
+      "discover",
+      "-s",
+      "singapore-outdoor-pm25/tests",
+      "-v"
+    ],
+    "files.exclude": {
+      "**/.venv": true,
+      "**/__pycache__": true
+    },
+    "git.openRepositoryInParentFolders": "always"
+  },
+  "extensions": {
+    "recommendations": [
+      "ms-python.python"
+    ]
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "UbiFunctions: Setup Python tooling",
+        "type": "process",
+        "command": "python3",
+        "args": [
+          "${workspaceFolder}/tools/bootstrap.py"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder}"
+        },
+        "problemMatcher": [],
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated"
+        }
+      },
+      {
+        "label": "UbiFunctions: Check tooling",
+        "type": "process",
+        "command": "${workspaceFolder}/.venv/bin/python",
+        "args": [
+          "${workspaceFolder}/tools/workflow.py",
+          "doctor"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder}"
+        },
+        "problemMatcher": [],
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated"
+        },
+        "windows": {
+          "command": "${workspaceFolder}/.venv/Scripts/python.exe"
+        }
+      },
+      {
+        "label": "UbiFunctions: Configure account privately",
+        "type": "process",
+        "command": "${workspaceFolder}/.venv/bin/python",
+        "args": [
+          "${workspaceFolder}/tools/workflow.py",
+          "config",
+          "--profile",
+          "${input:profile}"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder}"
+        },
+        "problemMatcher": [],
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated"
+        },
+        "windows": {
+          "command": "${workspaceFolder}/.venv/Scripts/python.exe"
+        }
+      },
+      {
+        "label": "UbiFunctions: Browser login (if supported by account)",
+        "type": "process",
+        "command": "${workspaceFolder}/.venv/bin/python",
+        "args": [
+          "${workspaceFolder}/tools/workflow.py",
+          "login",
+          "--profile",
+          "${input:profile}"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder}"
+        },
+        "problemMatcher": [],
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated"
+        },
+        "windows": {
+          "command": "${workspaceFolder}/.venv/Scripts/python.exe"
+        }
+      },
+      {
+        "label": "UbiFunctions: List remote functions",
+        "type": "process",
+        "command": "${workspaceFolder}/.venv/bin/python",
+        "args": [
+          "${workspaceFolder}/tools/workflow.py",
+          "list",
+          "--profile",
+          "${input:profile}"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder}"
+        },
+        "problemMatcher": [],
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated"
+        },
+        "windows": {
+          "command": "${workspaceFolder}/.venv/Scripts/python.exe"
+        }
+      },
+      {
+        "label": "UbiFunctions: Test function",
+        "type": "process",
+        "command": "${workspaceFolder}/.venv/bin/python",
+        "args": [
+          "${workspaceFolder}/tools/workflow.py",
+          "test",
+          "--project",
+          "${input:functionProject}"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder}"
+        },
+        "problemMatcher": [],
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated"
+        },
+        "windows": {
+          "command": "${workspaceFolder}/.venv/Scripts/python.exe"
+        }
+      },
+      {
+        "label": "UbiFunctions: Create new function",
+        "type": "process",
+        "command": "${workspaceFolder}/.venv/bin/python",
+        "args": [
+          "${workspaceFolder}/tools/workflow.py",
+          "new",
+          "--project",
+          "${input:newFunction}"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder}"
+        },
+        "problemMatcher": [],
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated"
+        },
+        "windows": {
+          "command": "${workspaceFolder}/.venv/Scripts/python.exe"
+        }
+      },
+      {
+        "label": "UbiFunctions: Prepare PM2.5 preview (local only)",
+        "type": "process",
+        "command": "${workspaceFolder}/.venv/bin/python",
+        "args": [
+          "${workspaceFolder}/tools/workflow.py",
+          "prepare",
+          "--profile",
+          "${input:profile}",
+          "--device-label",
+          "${input:deviceLabel}"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder}"
+        },
+        "problemMatcher": [],
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated"
+        },
+        "windows": {
+          "command": "${workspaceFolder}/.venv/Scripts/python.exe"
+        }
+      },
+      {
+        "label": "UbiFunctions: Deploy PM2.5 preview",
+        "type": "process",
+        "command": "${workspaceFolder}/.venv/bin/python",
+        "args": [
+          "${workspaceFolder}/tools/workflow.py",
+          "push",
+          "--profile",
+          "${input:profile}",
+          "--device-label",
+          "${input:deviceLabel}"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder}"
+        },
+        "problemMatcher": [],
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated"
+        },
+        "windows": {
+          "command": "${workspaceFolder}/.venv/Scripts/python.exe"
+        }
+      },
+      {
+        "label": "UbiFunctions: Deploy PM2.5 live, schedule OFF",
+        "type": "process",
+        "command": "${workspaceFolder}/.venv/bin/python",
+        "args": [
+          "${workspaceFolder}/tools/workflow.py",
+          "push",
+          "--profile",
+          "${input:profile}",
+          "--device-label",
+          "${input:deviceLabel}",
+          "--live"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder}"
+        },
+        "problemMatcher": [],
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated"
+        },
+        "windows": {
+          "command": "${workspaceFolder}/.venv/Scripts/python.exe"
+        }
+      },
+      {
+        "label": "UbiFunctions: Deploy PM2.5 live, schedule ON",
+        "type": "process",
+        "command": "${workspaceFolder}/.venv/bin/python",
+        "args": [
+          "${workspaceFolder}/tools/workflow.py",
+          "push",
+          "--profile",
+          "${input:profile}",
+          "--device-label",
+          "${input:deviceLabel}",
+          "--live",
+          "--enable-schedule"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder}"
+        },
+        "problemMatcher": [],
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated"
+        },
+        "windows": {
+          "command": "${workspaceFolder}/.venv/Scripts/python.exe"
+        }
+      },
+      {
+        "label": "UbiFunctions: Run selected remote function",
+        "type": "process",
+        "command": "${workspaceFolder}/.venv/bin/python",
+        "args": [
+          "${workspaceFolder}/tools/workflow.py",
+          "run",
+          "--project",
+          "${input:functionProject}",
+          "--profile",
+          "${input:profile}"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder}"
+        },
+        "problemMatcher": [],
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated"
+        },
+        "windows": {
+          "command": "${workspaceFolder}/.venv/Scripts/python.exe"
+        }
+      },
+      {
+        "label": "UbiFunctions: Read selected function logs",
+        "type": "process",
+        "command": "${workspaceFolder}/.venv/bin/python",
+        "args": [
+          "${workspaceFolder}/tools/workflow.py",
+          "logs",
+          "--project",
+          "${input:functionProject}",
+          "--profile",
+          "${input:profile}"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder}"
+        },
+        "problemMatcher": [],
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated"
+        },
+        "windows": {
+          "command": "${workspaceFolder}/.venv/Scripts/python.exe"
+        }
+      },
+      {
+        "label": "UbiFunctions: PM2.5 fixture preview (offline)",
+        "type": "process",
+        "command": "${workspaceFolder}/.venv/bin/python",
+        "args": [
+          "${workspaceFolder}/singapore-outdoor-pm25/tools/preview.py",
+          "--fixture",
+          "${workspaceFolder}/singapore-outdoor-pm25/tests/fixtures/pm25.json",
+          "--at",
+          "2026-10-12T16:20:00+08:00"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder}"
+        },
+        "problemMatcher": [],
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated"
+        },
+        "windows": {
+          "command": "${workspaceFolder}/.venv/Scripts/python.exe"
+        }
+      },
+      {
+        "label": "UbiFunctions: Prepare selected preview (local only)",
+        "type": "process",
+        "command": "${workspaceFolder}/.venv/bin/python",
+        "args": [
+          "${workspaceFolder}/tools/workflow.py",
+          "prepare",
+          "--project",
+          "${input:functionProject}",
+          "--profile",
+          "${input:profile}",
+          "--device-label",
+          "${input:deviceLabel}"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder}"
+        },
+        "problemMatcher": [],
+        "windows": {
+          "command": "${workspaceFolder}/.venv/Scripts/python.exe"
+        }
+      },
+      {
+        "label": "UbiFunctions: Deploy selected function preview",
+        "type": "process",
+        "command": "${workspaceFolder}/.venv/bin/python",
+        "args": [
+          "${workspaceFolder}/tools/workflow.py",
+          "push",
+          "--project",
+          "${input:functionProject}",
+          "--profile",
+          "${input:profile}",
+          "--device-label",
+          "${input:deviceLabel}"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder}"
+        },
+        "problemMatcher": [],
+        "windows": {
+          "command": "${workspaceFolder}/.venv/Scripts/python.exe"
+        }
+      }
+    ],
+    "inputs": [
+      {
+        "id": "functionProject",
+        "type": "promptString",
+        "description": "Function folder under backend/",
+        "default": "singapore-outdoor-pm25"
+      },
+      {
+        "id": "profile",
+        "type": "promptString",
+        "description": "Local Ubidots profile; also suffixes the remote function label",
+        "default": "aqw-dev"
+      },
+      {
+        "id": "deviceLabel",
+        "type": "promptString",
+        "description": "Existing Ubidots device API label (never a credential)",
+        "default": ""
+      },
+      {
+        "id": "newFunction",
+        "type": "promptString",
+        "description": "New function folder/name, lowercase with hyphens",
+        "default": "my-next-function"
+      }
+    ]
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Debug PM2.5 fixture preview (offline)",
+        "type": "debugpy",
+        "request": "launch",
+        "program": "${workspaceFolder}/singapore-outdoor-pm25/tools/preview.py",
+        "args": [
+          "--fixture",
+          "${workspaceFolder}/singapore-outdoor-pm25/tests/fixtures/pm25.json",
+          "--at",
+          "2026-10-12T16:20:00+08:00"
+        ],
+        "console": "integratedTerminal"
+      }
+    ]
+  }
+}

@@ -6,9 +6,10 @@ supported hardware target. The current setup uses USB 5 V power without a LiPo.
 
 **Honeywell + Si7021 + CCS811 → Argon Wi-Fi → Particle Cloud → Ubidots webhook**
 
-The firmware publishes one `air_quality` JSON event every 60 seconds after
-startup. It reports PM2.5, PM10, temperature, humidity, TVOC, estimated eCO₂ and
-Wi-Fi RSSI. Invalid, stale or conditioning-period readings are `null`.
+The firmware publishes one `air_quality` JSON event every 15 minutes after
+startup. It samples PM once per minute and reports the latest valid reading.
+It reports PM2.5, PM10, temperature, humidity, TVOC, estimated eCO₂ and Wi-Fi
+RSSI. Invalid, stale or conditioning-period readings are `null`.
 eCO₂ is a VOC-derived estimate, not a direct CO₂ measurement.
 
 The owner reports all seven variables arriving in Ubidots. This is an existing
@@ -17,6 +18,10 @@ cloud integration, not a new live test performed by this documentation update.
 checks, Argon builds and hardware/cloud results.
 
 ## Start here
+
+For reusable UbiFunctions development, start with the [documentation index](docs/README.md):
+[environment setup](docs/DEVELOPMENT_ENVIRONMENT.md), [AI workflow](docs/AI_DEVELOPMENT_WORKFLOW.md),
+[CI/CD](docs/CI_CD_PIPELINE.md), and [work orders](docs/workorders/README.md).
 
 | Document | Purpose |
 | --- | --- |
@@ -81,3 +86,28 @@ Vendored `particleflux-Si7021` 1.2.1 and
 `SparkFun_CCS811_Arduino_Library` 2.0.1 retain their upstream MIT license notices.
 Required short-read, initialization and timing fixes are documented in the
 [technical reference](docs/HARDWARE_REFERENCE.md#vendored-dependencies-and-required-fixes).
+
+## Indoor + outdoor PM2.5 backend
+
+The [scheduled outdoor PM2.5 UbiFunction](backend/singapore-outdoor-pm25/README.md)
+adds NEA's central-region one-hour PM2.5 to the existing Ubidots device every
+15 minutes after deployment and schedule activation. It includes source, tests,
+credential-free sample data and a pinned CLI workflow for VS Code. Indoor
+firmware and its webhook are unchanged. Regional outdoor context and recent
+indoor measurements have different measurement periods.
+
+The implementation is prepared for sharing and owner deployment; see its
+[validation record](backend/singapore-outdoor-pm25/VALIDATION.md) before assuming
+it has been deployed or tested with live credentials.
+
+Develop UbiFunctions in the dedicated [VS Code backend workspace](backend/README.md):
+shared tooling, local tests, account profiles, explicit deployment and a starter
+for future Git-versioned Python functions. Firmware reporting-frequency changes
+remain a separate owner task.
+
+## Simple reTerminal display
+
+An optional [native two-panel PM2.5 display](display/reterminal/README.md) reads
+indoor and outdoor data from Ubidots without a browser. It provides large numbers,
+trend arrows, Singapore timestamps and stale-data handling. See its work order
+for trial status; this does not add another firmware target.

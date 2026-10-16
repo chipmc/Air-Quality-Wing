@@ -54,3 +54,11 @@ Use a GitHub issue and the
 [backend proposal checklist](docs/VIBE_CODING_CHALLENGE.md#optional-backend-challenge).
 Test sample JSON first. The owner can add a webhook after approving the endpoint,
 data mapping and handling of nulls, stale values and credentials.
+
+## Reusable backend development process
+
+For UbiFunctions work, follow the [AI development workflow](docs/AI_DEVELOPMENT_WORKFLOW.md)
+and [CI/CD guide](docs/CI_CD_PIPELINE.md). Create a [work order](docs/workorders/README.md)
+with scope, review findings, revision-specific validation, deployment evidence and
+owner acceptance. Apply firmware checks when firmware is affected; backend-only
+work uses the relevant backend checks and cloud acceptance instead.

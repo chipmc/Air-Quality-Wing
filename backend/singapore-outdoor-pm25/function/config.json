@@ -1,0 +1,6 @@
+{
+  "region": "central",
+  "device_label": "configure-device-label",
+  "mode": "preview",
+  "max_age_seconds": 10800
+}

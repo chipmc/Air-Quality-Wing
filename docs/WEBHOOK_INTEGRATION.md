@@ -32,11 +32,13 @@ An illustrative payload after conditioning is:
 
 All seven keys are present, with a number or literal JSON `null`. These are
 software validity bounds, not an accuracy guarantee or air quality classification.
-Sensor fields expire at 10 seconds. PM and environment pairs share validity;
-VOC fields also require the firmware's 20-minute conditioning gate. RSSI is null
-when Wi-Fi is unavailable or RSSI is zero/positive. The first report waits for
-startup; subsequent reports are 60 seconds apart. Offline reports are dropped.
-No sample timestamp is included; Particle's event metadata supplies publish time.
+Environment and VOC fields expire at 10 seconds. PM is sampled once per minute
+and expires after two minutes, allowing one failed poll to retain the preceding
+valid sample. PM and environment pairs share validity; VOC fields also require
+the firmware's 20-minute conditioning gate. RSSI is null when Wi-Fi is unavailable
+or RSSI is zero/positive. The first report waits for startup; subsequent reports
+are 15 minutes apart. Offline reports are dropped. No sample timestamp is included;
+Particle's event metadata supplies publish time.
 
 ## Configure a webhook without exposing credentials
 

@@ -97,10 +97,12 @@ stop the main loop or cloud connection. Failed I2C initialization is logged and
 requires restarting after correcting hardware; there is no recovery framework.
 
 Environment readings run every five seconds; CCS811 is polled every second.
+Honeywell PM readings are requested once per minute and the latest valid sample
+remains usable for two minutes, so one failed poll does not lose a report.
 The first diagnostic report occurs no earlier than 12 seconds after D5 HIGH,
 and, if Honeywell initialization succeeds, no earlier than six seconds after the
 start commands actually complete. This is normally slightly later than 12 seconds,
-then reports repeat every 60 seconds. A missing Honeywell does not postpone the
+then reports repeat every 15 minutes. A missing Honeywell does not postpone the
 first report indefinitely; PM fields are `null`. Honeywell startup waits six
 seconds from D5 HIGH for power settling and leaves another six full seconds of
 measurement time before reading. Each UART transaction
@@ -248,8 +250,9 @@ commit. Participants must not flash the owner's hardware or change integrations.
    Honeywell initialization, and Wi-Fi/cloud status. Test boot with everything
    connected, reset and a power cycle without relying on powered insertion.
 3. Check first report timing (at least 12 seconds from D5 HIGH and six seconds
-   after successful Honeywell start), then minute cadence. Check PM/environment
-   fields and VOC raw diagnostics; expect null VOC fields during 20 minutes.
+   after successful Honeywell start), one-minute PM sampling, then 15-minute
+   report cadence. Check PM/environment fields and VOC raw diagnostics; expect
+   null VOC fields during 20 minutes.
 4. With powered-off connection changes, test missing sensors. Confirm bounded
    failures, null fields and continued reporting; failed I2C initialization needs
    restart after repair. Check stale data, CCS811 errors and Wi-Fi loss.

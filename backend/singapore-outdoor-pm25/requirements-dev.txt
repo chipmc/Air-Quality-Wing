@@ -1,0 +1,2 @@
+# Requires Python 3.12+ for CLI 2.1.2. Isolated tooling only; deployed main.py uses the Python standard library.
+ubidots-cli==2.1.2

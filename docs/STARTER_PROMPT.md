@@ -22,8 +22,8 @@ reference and primary datasheets rather than silently guessing.
 Particle Argon is the ONLY target; use Device OS 6.4.1 and platform argon.
 Preserve the working firmware outside this objective. Keep the shared D5
 power/reset behavior, D6 wake state, Argon UART mapping, bounded transactions,
-sensor validity/freshness, conditioning, minute cadence, and air_quality JSON
-contract unless a specific change to them is part of this proposal.
+sensor validity/freshness, conditioning, sampling/report cadence, and air_quality
+JSON contract unless a specific change to them is part of this proposal.
 Preserve vendored library fixes and licenses. Store no credentials in source,
 event payloads, logs, examples or browser code.
 
